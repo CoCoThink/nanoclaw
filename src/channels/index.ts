@@ -10,4 +10,7 @@ import './discord.js';
 
 // telegram
 
+// web
+import './web.js';
+
 // whatsapp

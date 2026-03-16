@@ -27,6 +27,7 @@ import {
   PROXY_BIND_HOST,
 } from './container-runtime.js';
 import {
+  clearMessages,
   getAllChats,
   getAllRegisteredGroups,
   getAllSessions,
@@ -413,6 +414,26 @@ async function startMessageLoop(): Promise<void> {
           );
           const messagesToSend =
             allPending.length > 0 ? allPending : groupMessages;
+
+          // Check for /new command to start a new conversation
+          const newConversationMessage = messagesToSend.find(
+            (m) => m.content.trim() === '/new' || m.content.trim().toLowerCase() === '/new',
+          );
+
+          if (newConversationMessage) {
+            const count = clearMessages(chatJid);
+            lastAgentTimestamp[chatJid] = '';
+            saveState();
+            logger.info({ chatJid, count }, 'Conversation reset via /new command');
+
+            // Send confirmation message
+            await channel.sendMessage(
+              chatJid,
+              `✅ Started a new conversation. Cleared ${count} message(s).`,
+            );
+            continue; // Skip processing these messages
+          }
+
           const formatted = formatMessages(messagesToSend, TIMEZONE);
 
           if (queue.sendMessage(chatJid, formatted)) {
@@ -517,6 +538,7 @@ async function main(): Promise<void> {
       isGroup?: boolean,
     ) => storeChatMetadata(chatJid, timestamp, name, channel, isGroup),
     registeredGroups: () => registeredGroups,
+    registerGroup,
   };
 
   // Create and connect all registered channels.

@@ -363,6 +363,16 @@ export function getMessagesSince(
     .all(chatJid, sinceTimestamp, `${botPrefix}:%`, limit) as NewMessage[];
 }
 
+/**
+ * Clear all messages for a chat, starting a new conversation.
+ * Returns the number of messages deleted.
+ */
+export function clearMessages(chatJid: string): number {
+  const result = db.prepare('DELETE FROM messages WHERE chat_jid = ?').run(chatJid);
+  logger.info({ chatJid, count: result.changes }, 'Messages cleared');
+  return result.changes;
+}
+
 export function createTask(
   task: Omit<ScheduledTask, 'last_run' | 'last_result'>,
 ): void {
