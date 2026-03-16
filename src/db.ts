@@ -368,7 +368,9 @@ export function getMessagesSince(
  * Returns the number of messages deleted.
  */
 export function clearMessages(chatJid: string): number {
-  const result = db.prepare('DELETE FROM messages WHERE chat_jid = ?').run(chatJid);
+  const result = db
+    .prepare('DELETE FROM messages WHERE chat_jid = ?')
+    .run(chatJid);
   logger.info({ chatJid, count: result.changes }, 'Messages cleared');
   return result.changes;
 }

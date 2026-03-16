@@ -75,7 +75,10 @@ export class WebChannel implements Channel {
         requiresTrigger: false, // Web sessions don't need trigger prefix
       });
       group = this.opts.registeredGroups()[jid];
-      logger.info({ jid, folder: group?.folder }, 'Web session auto-registered');
+      logger.info(
+        { jid, folder: group?.folder },
+        'Web session auto-registered',
+      );
     }
 
     // Only deliver full message for registered sessions
@@ -116,19 +119,28 @@ export class WebChannel implements Channel {
     sessionManager.addMessage(session.sessionId, text, 'assistant');
 
     // Send via WebSocket if connected
-    if (session.websocket && session.websocket.readyState === 1) { // WebSocket.OPEN
+    if (session.websocket && session.websocket.readyState === 1) {
+      // WebSocket.OPEN
       try {
-        session.websocket.send(JSON.stringify({
-          type: 'message',
-          content: text,
-          timestamp: new Date().toISOString(),
-        }));
-        logger.info({ jid, length: text.length }, 'Web message sent via WebSocket');
+        session.websocket.send(
+          JSON.stringify({
+            type: 'message',
+            content: text,
+            timestamp: new Date().toISOString(),
+          }),
+        );
+        logger.info(
+          { jid, length: text.length },
+          'Web message sent via WebSocket',
+        );
       } catch (err) {
         logger.error({ jid, err }, 'Failed to send WebSocket message');
       }
     } else {
-      logger.debug({ jid }, 'Message stored for API polling (WebSocket not connected)');
+      logger.debug(
+        { jid },
+        'Message stored for API polling (WebSocket not connected)',
+      );
     }
   }
 
@@ -154,12 +166,15 @@ export class WebChannel implements Channel {
     const sessionManager = this.server.getSessionManager();
     const session = sessionManager.getSessionByJid(jid);
 
-    if (session?.websocket && session.websocket.readyState === 1) { // WebSocket.OPEN
+    if (session?.websocket && session.websocket.readyState === 1) {
+      // WebSocket.OPEN
       try {
-        session.websocket.send(JSON.stringify({
-          type: 'typing',
-          isTyping,
-        }));
+        session.websocket.send(
+          JSON.stringify({
+            type: 'typing',
+            isTyping,
+          }),
+        );
       } catch (err) {
         logger.debug({ jid, err }, 'Failed to send typing indicator');
       }
@@ -169,14 +184,13 @@ export class WebChannel implements Channel {
 
 registerChannel('web', (opts: ChannelOpts) => {
   const envVars = readEnvFile(['WEB_PORT', 'WEB_AUTH_TOKEN']);
-  const port = parseInt(
-    process.env.WEB_PORT || envVars.WEB_PORT || '3000',
-    10,
-  );
+  const port = parseInt(process.env.WEB_PORT || envVars.WEB_PORT || '3000', 10);
   const authToken = process.env.WEB_AUTH_TOKEN || envVars.WEB_AUTH_TOKEN;
 
   if (!authToken) {
-    logger.warn('Web: WEB_AUTH_TOKEN not set. Web channel will not be available.');
+    logger.warn(
+      'Web: WEB_AUTH_TOKEN not set. Web channel will not be available.',
+    );
     return null;
   }
 

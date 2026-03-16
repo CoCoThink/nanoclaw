@@ -104,7 +104,11 @@ export class SessionManager {
   /**
    * Add a message to a session
    */
-  addMessage(sessionId: string, content: string, sender: 'user' | 'assistant'): SessionMessage | null {
+  addMessage(
+    sessionId: string,
+    content: string,
+    sender: 'user' | 'assistant',
+  ): SessionMessage | null {
     const session = this.sessions.get(sessionId);
     if (!session) return null;
 
@@ -161,7 +165,10 @@ export class SessionManager {
       const age = now.getTime() - session.lastSeen.getTime();
       if (age > timeout) {
         // Close WebSocket if still connected
-        if (session.websocket && session.websocket.readyState === WebSocket.OPEN) {
+        if (
+          session.websocket &&
+          session.websocket.readyState === WebSocket.OPEN
+        ) {
           session.websocket.close();
         }
         this.sessions.delete(sessionId);
@@ -185,7 +192,10 @@ export class SessionManager {
   deleteSession(sessionId: string): boolean {
     const session = this.sessions.get(sessionId);
     if (session) {
-      if (session.websocket && session.websocket.readyState === WebSocket.OPEN) {
+      if (
+        session.websocket &&
+        session.websocket.readyState === WebSocket.OPEN
+      ) {
         session.websocket.close();
       }
       return this.sessions.delete(sessionId);

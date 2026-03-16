@@ -101,7 +101,10 @@ export class WebServer {
 
     this.wss.on('connection', (ws: any, req: any) => {
       // Extract session ID from query string
-      const url = new URL(req.url || '', `http://localhost:${this.config.port}`);
+      const url = new URL(
+        req.url || '',
+        `http://localhost:${this.config.port}`,
+      );
       const sessionId = url.searchParams.get('sessionId');
 
       if (!sessionId) {
@@ -112,7 +115,10 @@ export class WebServer {
 
       const session = this.sessionManager.getSession(sessionId);
       if (!session) {
-        logger.warn({ sessionId }, 'WebSocket connection with invalid sessionId');
+        logger.warn(
+          { sessionId },
+          'WebSocket connection with invalid sessionId',
+        );
         ws.close(4001, 'Invalid session');
         return;
       }
@@ -150,11 +156,13 @@ export class WebServer {
       });
 
       // Send initial connection confirmation
-      ws.send(JSON.stringify({
-        type: 'connected',
-        sessionId,
-        messages: this.sessionManager.getMessages(sessionId),
-      }));
+      ws.send(
+        JSON.stringify({
+          type: 'connected',
+          sessionId,
+          messages: this.sessionManager.getMessages(sessionId),
+        }),
+      );
     });
   }
 

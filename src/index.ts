@@ -417,14 +417,19 @@ async function startMessageLoop(): Promise<void> {
 
           // Check for /new command to start a new conversation
           const newConversationMessage = messagesToSend.find(
-            (m) => m.content.trim() === '/new' || m.content.trim().toLowerCase() === '/new',
+            (m) =>
+              m.content.trim() === '/new' ||
+              m.content.trim().toLowerCase() === '/new',
           );
 
           if (newConversationMessage) {
             const count = clearMessages(chatJid);
             lastAgentTimestamp[chatJid] = '';
             saveState();
-            logger.info({ chatJid, count }, 'Conversation reset via /new command');
+            logger.info(
+              { chatJid, count },
+              'Conversation reset via /new command',
+            );
 
             // Send confirmation message
             await channel.sendMessage(
